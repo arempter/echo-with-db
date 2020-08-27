@@ -1,0 +1,12 @@
+version: "3"
+services:
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=echodb
+      - MYSQL_USER=echo
+      - MYSQL_PASSWORD=echo
+    ports:
+      - 3306:3306
