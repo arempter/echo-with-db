@@ -17,6 +17,8 @@ func Log(e error) {
 		"operation": err.Op,
 	})
 
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+
 	switch err.Level {
 	case logrus.ErrorLevel:
 		log.Error(err.Msg)

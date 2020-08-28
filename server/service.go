@@ -2,32 +2,25 @@ package server
 
 import (
 	"echo-with-db/api"
-	"echo-with-db/config"
 	"echo-with-db/errors"
-	"echo-with-db/utils"
 	"fmt"
-	"github.com/caarlos0/env"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
 type UsersService interface {
-	SetupRoutes()
 	Start()
-	AttachMW()
+	setupRoutes()
+	attachMW()
 }
 
 type service struct {
 	e  *echo.Echo
 	mw []echo.MiddlewareFunc
-	c  config.Server
+	c  Config
 }
 
-func New(mw []echo.MiddlewareFunc) *service {
-	cfg := config.Server{}
-	if err := env.Parse(&cfg); err != nil {
-		utils.Log(errors.E("failed to parse server configuration"))
-	}
+func New(cfg Config, mw []echo.MiddlewareFunc) *service {
 	return &service{
 		e:  echo.New(),
 		mw: mw,
@@ -37,10 +30,11 @@ func New(mw []echo.MiddlewareFunc) *service {
 
 func (s service) Start() *errors.Error {
 	const op errors.Op = "service.start"
-	const kind errors.Message = "failed to start service"
+	const kind errors.Msg = "failed to start service"
 
-	s.SetupRoutes()
-	s.AttachMW()
+	s.setupRoutes()
+	s.attachMW()
+
 	err := s.e.Start(fmt.Sprintf("%s:%d", s.c.Host, s.c.Port))
 	if err != nil {
 		return errors.E(op, kind, err, logrus.ErrorLevel)
@@ -48,12 +42,12 @@ func (s service) Start() *errors.Error {
 	return nil
 }
 
-func (s service) AttachMW() {
+func (s service) attachMW() {
 	for _, f := range s.mw {
 		s.e.Use(f)
 	}
 }
 
-func (s service) SetupRoutes() {
+func (s service) setupRoutes() {
 	s.e.Add("POST", "/user/add", api.HandlerAddUser())
 }

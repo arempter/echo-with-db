@@ -37,8 +37,7 @@ func HandlerAddUser() echo.HandlerFunc {
 		if !added {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("failed to add user to db"))
 		}
-		msg := errors.Message(fmt.Sprintf("Parsing ok, adding db entry, user: %s", u.UserName))
-		utils.Log(errors.E(op, msg))
+		utils.Log(errors.E(op, errors.Msg(fmt.Sprintf("Json parsing ok, adding db entry, user: %s", u.UserName))))
 
 		return c.JSON(http.StatusOK, u)
 	}

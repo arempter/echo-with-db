@@ -42,7 +42,7 @@ func (s service) CreateSchema() *errors.Error {
 	const op errors.Op = "schema.create"
 	_, err := s.db.Exec(schema)
 	if err != nil {
-		return errors.E(op, errors.Message("failed to create database schema"), err, logrus.ErrorLevel)
+		return errors.E(op, errors.Msg("failed to create database schema"), err, logrus.ErrorLevel)
 	}
 	return nil
 }
@@ -51,7 +51,7 @@ func (s service) AddUser(ctx context.Context, user User) bool {
 	const op errors.Op = "user.add"
 	_, err := s.db.NamedExecContext(ctx, addUserQuery, user)
 	if err != nil {
-		utils.Log(errors.E(op, errors.Message("failed to add user to db"), err, logrus.WarnLevel))
+		utils.Log(errors.E(op, errors.Msg("failed to add user to db"), err, logrus.WarnLevel))
 		return false
 	}
 	return true
@@ -66,7 +66,7 @@ func Connect() (*sqlx.DB, *errors.Error) {
 
 	db, err := sqlx.Connect("mysql", "echo:echo@/echodb")
 	if err != nil {
-		return nil, errors.E(op, errors.Message("failed to connect to database"), err, logrus.ErrorLevel)
+		return nil, errors.E(op, errors.Msg("failed to connect to database"), err, logrus.ErrorLevel)
 	}
 
 	return db, nil
