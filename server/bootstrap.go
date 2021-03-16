@@ -5,12 +5,14 @@ import (
 	"echo-with-db/config"
 	"echo-with-db/database"
 	"echo-with-db/database/mysql"
+	"echo-with-db/database/postgres"
 	"echo-with-db/errors"
 	customMW "echo-with-db/middleware"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -53,9 +55,9 @@ func connect(cfg config.Config) (database.Database, *errors.Error) {
 	const op errors.Op = "database.connect"
 	switch cfg.DbDriver {
 	case MYSQL:
-		con, err := sqlx.Connect("mysql", "echo:echo@/echodb")
+		con, err := sqlx.Connect(MYSQL, "echo:echo@/echodb")
 		if err != nil {
-			return nil, errors.E(op, errors.Msg("failed to connect to database"), err, logrus.ErrorLevel)
+			return nil, errors.E(op, errors.Msg("failed to connect to database: "+err.Error()), logrus.ErrorLevel)
 		}
 		dbLayer, err := mysql.New(con, true, cfg)
 		if err.(*errors.Error) != nil {
@@ -63,7 +65,15 @@ func connect(cfg config.Config) (database.Database, *errors.Error) {
 		}
 		return dbLayer, nil
 	case POSTGRES:
-		return nil, errors.E(op, errors.Msg("unsupported database type"), logrus.ErrorLevel)
+		con, err := sqlx.Connect(POSTGRES, "postgres://echo:echo@localhost:5432/echodb?sslmode=disable")
+		if err != nil {
+			return nil, errors.E(op, errors.Msg("failed to connect to database: "+err.Error()), logrus.ErrorLevel)
+		}
+		dbLayer, err := postgres.New(con, true, cfg)
+		if err.(*errors.Error) != nil {
+			return nil, err.(*errors.Error)
+		}
+		return dbLayer, nil
 	default:
 		return nil, errors.E(op, errors.Msg("unsupported database type"), logrus.ErrorLevel)
 	}

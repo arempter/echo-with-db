@@ -1,0 +1,24 @@
+package postgres
+
+import (
+	"echo-with-db/errors"
+	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+)
+
+var schema = fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id SERIAL,    	
+		user_name VARCHAR(10) NOT NULL UNIQUE,
+		description VARCHAR(20) NOT NULL,
+		PRIMARY KEY (id)	
+	);`, UsersTable)
+
+func createSchema(db *sqlx.DB) *errors.Error {
+	const op errors.Op = "schema.create"
+	_, err := db.Exec(schema)
+	if err != nil {
+		return errors.E(op, errors.Msg("failed to create database schema for mysql"), err, logrus.ErrorLevel)
+	}
+	return nil
+}

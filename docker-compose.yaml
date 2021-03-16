@@ -10,3 +10,12 @@ services:
       - MYSQL_PASSWORD=echo
     ports:
       - 3306:3306
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=echo
+      - POSTGRES_PASSWORD=echo
+      - POSTGRES_DB=echodb
+    ports:
+    - 5432:5432
