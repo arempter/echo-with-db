@@ -33,7 +33,7 @@ func HandlerAddUser() echo.HandlerFunc {
 			Description: u.Description,
 		}
 
-		added := db.AddUser(c.Request().Context(), user)
+		added := db.Users().AddUser(c.Request().Context(), user)
 		if !added {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("failed to add user to db"))
 		}
