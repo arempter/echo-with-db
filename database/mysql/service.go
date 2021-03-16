@@ -21,23 +21,15 @@ func (s mysql) Users() database.UserService {
 	return s.users
 }
 
-func New(db *sqlx.DB, createSchema bool, cfg config.Config) (*mysql, *errors.Error) {
+func New(db *sqlx.DB, initSchema bool, cfg config.Config) (*mysql, *errors.Error) {
 	s := &mysql{db: db, cfg: cfg}
-	if createSchema {
-		err := s.createSchema()
+	if initSchema {
+		err := createSchema(s.db)
 		if err != nil {
 			return nil, err
 		}
 	}
 	return s, nil
-}
-
-func (s mysql) createSchema() *errors.Error {
-	err := CreateSchema(s.db)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (s mysql) Logout() {

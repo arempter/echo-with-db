@@ -14,7 +14,7 @@ var schema = fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		PRIMARY KEY (id)	
 	);`, UsersTable)
 
-func CreateSchema(db *sqlx.DB) *errors.Error {
+func createSchema(db *sqlx.DB) *errors.Error {
 	const op errors.Op = "schema.create"
 	_, err := db.Exec(schema)
 	if err != nil {
